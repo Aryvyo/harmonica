@@ -52,6 +52,7 @@ function HoverZone({...props}) {
   const [colour,setColour] = React.useState("orange");
   const [enterTime, setEnterTime] = React.useState(0);
   const [playing, setPlaying] = React.useState(true);
+  const [exitTime, setExitTime] = React.useState(0);
   const [attack] = useSound("/audio/" + props.note + "attack.mp3", {
     onend: () => { 
             console.log("attack ended");  
@@ -63,6 +64,8 @@ function HoverZone({...props}) {
   const onHover = async () => {
     setColour("red");
     setEnterTime(Date.now());
+    const exitdiff = (Date.now() - exitTime)/1000;
+    props.FileConstructor.setArray({note: 0,time: exitdiff}); // math is off, pls fix!
     attack();
     setTimeout(() => {
       sustain();
@@ -74,7 +77,7 @@ function HoverZone({...props}) {
     const timediff = (Date.now() - enterTime)/1000;
     console.log("Hovered on " + props.note + " for " + timediff + " seconds");
     props.FileConstructor.setArray({note: props.note,time: timediff});
-    
+    setExitTime(Date.now());
     setPlaying(false);
     stop();
     decay();
