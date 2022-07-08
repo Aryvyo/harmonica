@@ -9,7 +9,7 @@ title: Harmonica Blues Harp
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import {useSound} from 'use-sound'
-
+import { createFFmpeg, FFmpeg } from '@ffmpeg/ffmpeg'
 export default function Model({ ...props }) {
   const group = useRef()
   const { nodes, materials } = useGLTF('/harmonica/harmonica.gltf')
@@ -133,7 +133,7 @@ function HoverZone({...props}) {
 class FileConstructor {
   constructor() {
     this.array = [];
-    this.testarray = [{note: "1",time: 1},{note: 0,time:1},{note: "2",time: 1}]
+    this.testarray = [{note: "1",time: 1},{note: 0,time:1},{note: "2",time: 1},{note:"3",time: 0.5}]
   }
   setArray(obj) {
     this.array.push(obj);
@@ -147,10 +147,12 @@ class FileConstructor {
   }
   ConstructFile(array) {
     console.log(array);
-    //construct files
+    const ffmpeg = createFFmpeg();
+
     let totaltime = 0
     for (let index = 0; index < array.length; index++) {
       const element = array[index];
+      if (element.note != 0){
       if (element["time"] > 0.889) {
         console.log("audio has a full attack");
         if (element["time"]-0.889 > 0 ) {
@@ -168,7 +170,13 @@ class FileConstructor {
       console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a cutoff attack");
     }
     totaltime += element["time"];}
+    else {
+      console.log("no note for " + element["time"] + " seconds");
+      totaltime += element["time"];
+    }
   }
+  console.log("total time: " + totaltime);} 
+
     
 }
 useGLTF.preload('/harmonica/harmonica.gltf')
