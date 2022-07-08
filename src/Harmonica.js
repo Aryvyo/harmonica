@@ -166,7 +166,8 @@ class FileConstructor {
     else {
       console.log("audio has cutoff attack");
       console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a cutoff attack");
-    }}
+    }
+    totaltime += element["time"];}
   }
     
 }
