@@ -81,6 +81,7 @@ function HoverZone({...props}) {
   }
   const onHoverExit = () => {
     setColour("orange");
+    props.FileConstructor.ConstructFile(props.FileConstructor.testArray());
     const timediff = (Date.now() - enterTime)/1000;
     console.log("Hovered on " + props.note + " for " + timediff + " seconds");
     props.FileConstructor.setArray({note: props.note,time: timediff});
@@ -132,6 +133,7 @@ function HoverZone({...props}) {
 class FileConstructor {
   constructor() {
     this.array = [];
+    this.testarray = [{note: "1",time: 1},{note: 0,time:1},{note: "2",time: 1}]
   }
   setArray(obj) {
     this.array.push(obj);
@@ -140,5 +142,32 @@ class FileConstructor {
   getArray() {
     return this.array;
   }
+  testArray() {
+    return this.testarray;
+  }
+  ConstructFile(array) {
+    console.log(array);
+    //construct files
+    let totaltime = 0
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index];
+      if (element["time"] > 0.889) {
+        console.log("audio has a full attack");
+        if (element["time"]-0.889 > 0 ) {
+          console.log("audio has a full sustain");
+          console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a sustain of " + (element["time"]-0.889) + " seconds");
+        }
+        else {
+          console.log("no sustain, just playing decay")
+          console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a decay");
+
+        }
+    }
+    else {
+      console.log("audio has cutoff attack");
+      console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a cutoff attack");
+    }}
+  }
+    
 }
 useGLTF.preload('/harmonica/harmonica.gltf')
