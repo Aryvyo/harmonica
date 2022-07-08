@@ -64,8 +64,15 @@ function HoverZone({...props}) {
   const onHover = async () => {
     setColour("red");
     setEnterTime(Date.now());
-    const exitdiff = (Date.now() - exitTime)/1000;
-    props.FileConstructor.setArray({note: 0,time: exitdiff}); // math is off, pls fix!
+    /*check length of array and if it isnt 0*/
+    if (props.FileConstructor.getArray().length > 0) {
+      const exitdiff = (Date.now() - exitTime)/1000;  
+      console.log(Date.now(), exitTime, exitdiff);
+      if(exitdiff < 100) {props.FileConstructor.setArray({note: 0,time: exitdiff});}
+
+    }
+    
+
     attack();
     setTimeout(() => {
       sustain();
