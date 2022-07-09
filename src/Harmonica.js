@@ -10,6 +10,7 @@ import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import {useSound} from 'use-sound'
 import { createFFmpeg, FFmpeg } from '@ffmpeg/ffmpeg'
+
 export default function Model({ ...props }) {
   const group = useRef()
   const { nodes, materials } = useGLTF('/harmonica/harmonica.gltf')
@@ -81,7 +82,7 @@ function HoverZone({...props}) {
   }
   const onHoverExit = () => {
     setColour("orange");
-    props.FileConstructor.ConstructFile(props.FileConstructor.testArray());
+    props.FileConstructor.TestConcat();
     const timediff = (Date.now() - enterTime)/1000;
     console.log("Hovered on " + props.note + " for " + timediff + " seconds");
     props.FileConstructor.setArray({note: props.note,time: timediff});
@@ -144,6 +145,21 @@ class FileConstructor {
   }
   testArray() {
     return this.testarray;
+  }
+  TestConcat() {
+    let test = ["/audio/1attack.mp3", "/audio/1sustain.mp3", "/audio/1decay.mp3"]
+    let inputlist = '"concat:"';
+    for (let index = 0; index < test.length; index++) {
+      const element = test[index];
+      if(index === test.length){
+        inputlist = inputlist + element + '"';
+      }
+      else {
+      inputlist = inputlist + element + "|";
+      }
+    }
+    console.log(inputlist);
+
   }
   ConstructFile(array) {
     console.log(array);
