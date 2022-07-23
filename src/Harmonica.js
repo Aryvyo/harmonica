@@ -9,7 +9,8 @@ title: Harmonica Blues Harp
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import {useSound} from 'use-sound'
-import { createFFmpeg, FFmpeg } from '@ffmpeg/ffmpeg'
+import { createFFmpeg, fetchFile, FFmpeg } from '@ffmpeg/ffmpeg'
+import axios from 'axios'
 
 export default function Model({ ...props }) {
   const group = useRef()
@@ -39,6 +40,7 @@ export default function Model({ ...props }) {
             <HoverZone position={[0.012,-0.025,0.01]} note="9" FileConstructor={array}/>
             <HoverZone position={[0.012,-0.0321,0.01]} note="10" FileConstructor={array}/>
 
+            <Record position={[0,0,0]} FileConstructor={array}/> 
           </group>
         </group>
       </group>
@@ -46,7 +48,18 @@ export default function Model({ ...props }) {
   )
 }
 
+function Record({...props}){
+  const mesh = useRef()
 
+  return(
+  <group>
+    <mesh {...props} ref={mesh} onPointerLeave={()=>{props.FileConstructor.localFile()}} >
+    <boxGeometry args={[.005,.005,.005]} />
+    <meshStandardMaterial color={"red"} transparent/>
+    </mesh>
+  </group>
+  )
+}
 
 function HoverZone({...props}) {
   const mesh = useRef();
@@ -82,7 +95,6 @@ function HoverZone({...props}) {
   }
   const onHoverExit = () => {
     setColour("orange");
-    props.FileConstructor.TestConcat();
     const timediff = (Date.now() - enterTime)/1000;
     console.log("Hovered on " + props.note + " for " + timediff + " seconds");
     props.FileConstructor.setArray({note: props.note,time: timediff});
@@ -134,7 +146,6 @@ function HoverZone({...props}) {
 class FileConstructor {
   constructor() {
     this.array = [];
-    this.testarray = [{note: "1",time: 1},{note: 0,time:1},{note: "2",time: 1},{note:"3",time: 0.5}]
   }
   setArray(obj) {
     this.array.push(obj);
@@ -146,52 +157,22 @@ class FileConstructor {
   testArray() {
     return this.testarray;
   }
-  TestConcat() {
-    let test = ["/audio/1attack.mp3", "/audio/1sustain.mp3", "/audio/1decay.mp3"]
-    let inputlist = '"concat:"';
-    for (let index = 0; index < test.length; index++) {
-      const element = test[index];
-      if(index === test.length){
-        inputlist = inputlist + element + '"';
+  localFile() {
+    var config = {
+      headers: {
+        "content" : JSON.stringify(this.array)
       }
-      else {
-      inputlist = inputlist + element + "|";
-      }
-    }
-    console.log(inputlist);
+    };
+
+      console.log("requesting", config);
+      axios.get(`http://localhost:3001`, config)
+        .then(res => {
+          console.log(res);
+      })
 
   }
-  ConstructFile(array) {
-    console.log(array);
-    const ffmpeg = createFFmpeg();
+  
 
-    let totaltime = 0
-    for (let index = 0; index < array.length; index++) {
-      const element = array[index];
-      if (element.note != 0){
-      if (element["time"] > 0.889) {
-        console.log("audio has a full attack");
-        if (element["time"]-0.889 > 0 ) {
-          console.log("audio has a full sustain");
-          console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a sustain of " + (element["time"]-0.889) + " seconds");
-        }
-        else {
-          console.log("no sustain, just playing decay")
-          console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a decay");
-
-        }
-    }
-    else {
-      console.log("audio has cutoff attack");
-      console.log("playing note " + element["note"] + " for " + element["time"] + " seconds with a cutoff attack");
-    }
-    totaltime += element["time"];}
-    else {
-      console.log("no note for " + element["time"] + " seconds");
-      totaltime += element["time"];
-    }
-  }
-  console.log("total time: " + totaltime);} 
 
     
 }
