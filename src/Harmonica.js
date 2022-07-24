@@ -6,9 +6,8 @@ source: https://sketchfab.com/3d-models/harmonica-blues-harp-af5ac47932f34104a67
 title: Harmonica Blues Harp
 */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import {useSound} from 'use-sound'
 import Wad from 'web-audio-daw';
 
 
@@ -104,8 +103,6 @@ function HoverZone({...props}) {
 
 function RecordZone({...props}) {
   const mesh = useRef();
-
-  const [recording, setRecording] = React.useState(false);
 
   props.FileConstructor.poly.recorder.start();
   
