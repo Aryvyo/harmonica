@@ -6,9 +6,11 @@ source: https://sketchfab.com/3d-models/harmonica-blues-harp-af5ac47932f34104a67
 title: Harmonica Blues Harp
 */
 
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import {useSound} from 'use-sound'
+import Wad from 'web-audio-daw';
+
 
 export default function Model({ ...props }) {
   const group = useRef()
@@ -38,6 +40,7 @@ export default function Model({ ...props }) {
             <HoverZone position={[0.012,-0.025,0.01]} note="9" FileConstructor={array}/>
             <HoverZone position={[0.012,-0.0321,0.01]} note="10" FileConstructor={array}/>
 
+            <RecordZone position={[0,0,0]} FileConstructor={array}/>
           </group>
         </group>
       </group>
@@ -50,85 +53,89 @@ export default function Model({ ...props }) {
 function HoverZone({...props}) {
   const mesh = useRef();
   const [colour,setColour] = React.useState("orange");
-  const [enterTime, setEnterTime] = React.useState(0);
-  const [playing, setPlaying] = React.useState(true);
-  const [exitTime, setExitTime] = React.useState(0);
-  const [attack] = useSound("/audio/" + props.note + "attack.mp3", {
-    onend: () => { 
-            console.log("attack ended");  
-          }})
-  const [sustain, { stop }] = useSound("/audio/" + props.note + "sustain.mp3", {
-    loop:true, onend: () => {console.log("sustain note");}})
-  const [decay] = useSound("/audio/" + props.note + "decay.mp3", {
-    })
-  const onHover = async () => {
-    setColour("red");
-    setEnterTime(Date.now());
-    const exitdiff = (Date.now() - exitTime)/1000;
-    props.FileConstructor.setArray({note: 0,time: exitdiff}); // math is off, pls fix!
-    attack();
-    setTimeout(() => {
-      sustain();
-    }, 889 );
+  const [playing,setPlaying] = React.useState(false);
+  const [sustainInterval,setSustainInterval] = React.useState(null);
 
-  }
-  const onHoverExit = () => {
-    setColour("orange");
-    const timediff = (Date.now() - enterTime)/1000;
-    console.log("Hovered on " + props.note + " for " + timediff + " seconds");
-    props.FileConstructor.setArray({note: props.note,time: timediff});
-    setExitTime(Date.now());
-    setPlaying(false);
-    stop();
-    decay();
-    setTimeout(() => {
-      stop();
-      setTimeout(() => {
-        stop();
-        setTimeout(() => {
-          stop();
-          setTimeout(() => {
-            stop();
-            setTimeout(() => {
-              stop();
-              setTimeout(() => {
-                stop();
-                setTimeout(() => {
-                  stop();
-                  setTimeout(() => {
-                    stop();
-                    setTimeout(() => {
-                      stop();
-                      setTimeout(() => {
-                        stop();
-                      }, 100);
-                    }, 100);
-                  }, 100);
-                }, 100);
-              }, 100);
-            }, 100);
-          }, 100);
-        }, 100);
-      }, 100);
-    }, 100);
+  var wad = new Wad({source: "/audio/" + props.note + ".mp3", 
     
+    sprite: {
+      attack: [0, 0.889],
+      sustain: [1, 1.129],
+      decay: [1.2, 2.009]
+
+    }  
+  });
+
+
+  props.FileConstructor.addWad(wad);
+
+
+
+  const onHover = () => {
+    wad.stop();
+
+    setColour("red");
+    wad.attack.play();
+    setPlaying(true);
+    setTimeout(() => {  
+      const interval = setInterval(() => {
+        wad.sustain.play({loop: true});
+      }, 129);
+      setSustainInterval(interval);
+    }, 889);
   }
 
+  const onHoverExit = async () => {
+    console.log("exit" , playing);
+    clearInterval(sustainInterval);
+    await setPlaying(false);
+    setColour("orange");
+    wad.stop();
+    wad.decay.play();
+  }
+    
   return (
-    <mesh {...props} ref={mesh} onPointerOver={() => onHover()} onPointerLeave={()=>{onHoverExit();stop();}} >
+    <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
     <boxGeometry args={[.005,.005,.005]} />
     <meshStandardMaterial color={colour} opacity={0.1} transparent/>
     </mesh>
   )
 }
 
+function RecordZone({...props}) {
+  const mesh = useRef();
+
+  const [recording, setRecording] = React.useState(false);
+
+  props.FileConstructor.poly.recorder.start();
+  
+  setTimeout(() => {
+    props.FileConstructor.poly.recorder.stop();
+  }, 10000);
+
+
+  return (
+    <mesh {...props} ref={mesh}  >
+    <boxGeometry args={[.005,.005,.005]}  />
+    <meshStandardMaterial color={"red"} opacity={1} transparent/>
+    </mesh>
+  )
+}
 class FileConstructor {
   constructor() {
     this.array = [];
+    this.poly = new Wad.Poly({
+      recorder: {
+          options: { mimeType : 'audio/webm' },
+          onstop: function(event) {
+              let blob = new Blob(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
+              window.open(URL.createObjectURL(blob));
+          }
+      }
+  });
   }
-  setArray(obj) {
-    this.array.push(obj);
-    console.log(this.array);
+  addWad(wad) {
+    this.poly.add(wad);
   }
   getArray() {
     return this.array;
