@@ -11,10 +11,37 @@ import { useGLTF } from '@react-three/drei'
 import Wad from 'web-audio-daw';
 
 
+
+class FileConstructor {
+  constructor() {
+    this.array = [];
+    this.poly = new Wad.Poly({
+      recorder: {
+          options: { mimeType : 'audio/webm' },
+          onstop: function(event) {
+              let blob = new Blob(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
+              window.open(URL.createObjectURL(blob));
+          }
+      }
+  });
+
+  }
+  addWad(wad) {
+    this.poly.add(wad);
+  }
+  getArray() {
+    return this.array;
+  }
+}
+
+const array = new FileConstructor();
+export { array }
+
 export default function Model({ ...props }) {
   const group = useRef()
   const { nodes, materials } = useGLTF('/harmonica/harmonica.gltf')
-  const array = new FileConstructor();
+  
+
 
   return (
     <group ref={group} {...props} dispose={null}>
@@ -39,7 +66,6 @@ export default function Model({ ...props }) {
             <HoverZone position={[0.012,-0.025,0.01]} note="9" FileConstructor={array}/>
             <HoverZone position={[0.012,-0.0321,0.01]} note="10" FileConstructor={array}/>
 
-            <RecordZone position={[0,0,0]} FileConstructor={array}/>
           </group>
         </group>
       </group>
@@ -117,41 +143,6 @@ function HoverZone({...props}) {
   )
 }
 
-function RecordZone({...props}) {
-  const mesh = useRef();
 
-  props.FileConstructor.poly.recorder.start();
-  
-  setTimeout(() => {
-    //props.FileConstructor.poly.recorder.stop();
-  }, 10000);
-
-
-  return (
-    <mesh {...props} ref={mesh}  >
-    <boxGeometry args={[.005,.005,.005]}  />
-    <meshStandardMaterial color={"red"} opacity={1} transparent/>
-    </mesh>
-  )
-}
-class FileConstructor {
-  constructor() {
-    this.array = [];
-    this.poly = new Wad.Poly({
-      recorder: {
-          options: { mimeType : 'audio/webm' },
-          onstop: function(event) {
-              let blob = new Blob(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
-              window.open(URL.createObjectURL(blob));
-          }
-      }
-  });
-  }
-  addWad(wad) {
-    this.poly.add(wad);
-  }
-  getArray() {
-    return this.array;
-  }
-}
 useGLTF.preload('/harmonica/harmonica.gltf')
+
