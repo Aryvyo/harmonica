@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+/public/audio/sounds_data/
+/public/audio/sounds.aup

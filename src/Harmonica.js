@@ -6,14 +6,42 @@ source: https://sketchfab.com/3d-models/harmonica-blues-harp-af5ac47932f34104a67
 title: Harmonica Blues Harp
 */
 
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import {useSound} from 'use-sound'
+import Wad from 'web-audio-daw';
+
+
+
+class FileConstructor {
+  constructor() {
+    this.array = [];
+    this.poly = new Wad.Poly({
+      recorder: {
+          options: { mimeType : 'audio/webm' },
+          onstop: function(event) {
+              let blob = new Blob(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
+              window.open(URL.createObjectURL(blob));
+          }
+      }
+  });
+
+  }
+  addWad(wad) {
+    this.poly.add(wad);
+  }
+  getArray() {
+    return this.array;
+  }
+}
+
+const array = new FileConstructor();
+export { array }
 
 export default function Model({ ...props }) {
   const group = useRef()
   const { nodes, materials } = useGLTF('/harmonica/harmonica.gltf')
-  const array = new FileConstructor();
+  
+
 
   return (
     <group ref={group} {...props} dispose={null}>
@@ -50,95 +78,70 @@ export default function Model({ ...props }) {
 function HoverZone({...props}) {
   const mesh = useRef();
   const [colour,setColour] = React.useState("orange");
-  const [enterTime, setEnterTime] = React.useState(0);
-  const [playing, setPlaying] = React.useState(true);
-  const [exitTime, setExitTime] = React.useState(0);
-  const [attack] = useSound("/audio/" + props.note + "attack.mp3", {
-    onend: () => { 
-            console.log("attack ended");  
-          }})
-  const [sustain, { stop }] = useSound("/audio/" + props.note + "sustain.mp3", {
-    loop:true, onend: () => {console.log("sustain note");}})
-  const [decay] = useSound("/audio/" + props.note + "decay.mp3", {
-    })
-  const onHover = async () => {
-    setColour("red");
-    setEnterTime(Date.now());
-    /*check length of array and if it isnt 0*/
-    if (props.FileConstructor.getArray().length > 0) {
-      const exitdiff = (Date.now() - exitTime)/1000;  
-      console.log(Date.now(), exitTime, exitdiff);
-      if(exitdiff < 100) {props.FileConstructor.setArray({note: 0,time: exitdiff});}
 
+
+  const SustainLengthSwitch = () => {
+    //switch statement 
+    switch(props.note) {
+      case "6": 
+      return 1.02647
+      default:
+      return 1.02647
     }
-    
-
-    attack();
-    setTimeout(() => {
-      sustain();
-    }, 889 );
-
   }
-  const onHoverExit = () => {
+
+  var wad = new Wad({source: "/audio/" + props.note + ".ogg", 
+    
+    sprite: {
+      attack: [0, 0.889],
+      sustain: [1, 1 + SustainLengthSwitch()],
+      decay: [3, 4.5]
+
+    }  
+  });
+
+
+  props.FileConstructor.addWad(wad);
+
+  useEffect(() => {
+    if(playing === false) {
+      clearInterval(sustainInterval);
+    }
+  });
+
+  const onHover = () => {
+    wad.stop();
+
+    setColour("red");
+    wad.attack.play();
+    setPlaying(true);
+    setTimeout(() => {
+      wad.sustain.play();  
+      const interval = setInterval(() => {
+        wad.sustain.play();
+      }, 1026.5);
+      setSustainInterval(interval);
+    }, 889);
+  }
+
+  const onHoverExit = async () => {
+    console.log("exit" , playing);
+    await clearInterval(sustainInterval);
+    await wad.stop()
+    await setPlaying(false);
     setColour("orange");
-    const timediff = (Date.now() - enterTime)/1000;
-    console.log("Hovered on " + props.note + " for " + timediff + " seconds");
-    props.FileConstructor.setArray({note: props.note,time: timediff});
-    setExitTime(Date.now());
-    setPlaying(false);
-    stop();
-    decay();
-    setTimeout(() => {
-      stop();
-      setTimeout(() => {
-        stop();
-        setTimeout(() => {
-          stop();
-          setTimeout(() => {
-            stop();
-            setTimeout(() => {
-              stop();
-              setTimeout(() => {
-                stop();
-                setTimeout(() => {
-                  stop();
-                  setTimeout(() => {
-                    stop();
-                    setTimeout(() => {
-                      stop();
-                      setTimeout(() => {
-                        stop();
-                      }, 100);
-                    }, 100);
-                  }, 100);
-                }, 100);
-              }, 100);
-            }, 100);
-          }, 100);
-        }, 100);
-      }, 100);
-    }, 100);
-    
+    wad.stop();
+    wad.decay.play();
   }
-
+    
   return (
-    <mesh {...props} ref={mesh} onPointerOver={() => onHover()} onPointerLeave={()=>{onHoverExit();stop();}} >
+    <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
     <boxGeometry args={[.005,.005,.005]} />
     <meshStandardMaterial color={colour} opacity={0.1} transparent/>
     </mesh>
   )
 }
 
-class FileConstructor {
-  constructor() {
-    this.array = [];
-  }
-  setArray(obj) {
-    this.array.push(obj);
-    console.log(this.array);
-  }
-  getArray() {
-    return this.array;
-  }
-}
+
 useGLTF.preload('/harmonica/harmonica.gltf')
+
