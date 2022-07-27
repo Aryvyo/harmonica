@@ -6,7 +6,7 @@ source: https://sketchfab.com/3d-models/harmonica-blues-harp-af5ac47932f34104a67
 title: Harmonica Blues Harp
 */
 
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import Wad from 'web-audio-daw';
 
@@ -55,12 +55,22 @@ function HoverZone({...props}) {
   const [playing,setPlaying] = React.useState(false);
   const [sustainInterval,setSustainInterval] = React.useState(null);
 
-  var wad = new Wad({source: "/audio/" + props.note + ".mp3", 
+  const SustainLengthSwitch = () => {
+    //switch statement 
+    switch(props.note) {
+      case "6": 
+      return 1.02647
+      default:
+      return 1.02647
+    }
+  }
+
+  var wad = new Wad({source: "/audio/" + props.note + ".ogg", 
     
     sprite: {
       attack: [0, 0.889],
-      sustain: [1, 1.129],
-      decay: [1.2, 2.009]
+      sustain: [1, 1 + SustainLengthSwitch()],
+      decay: [3, 4.5]
 
     }  
   });
@@ -68,7 +78,11 @@ function HoverZone({...props}) {
 
   props.FileConstructor.addWad(wad);
 
-
+  useEffect(() => {
+    if(playing === false) {
+      clearInterval(sustainInterval);
+    }
+  });
 
   const onHover = () => {
     wad.stop();
@@ -76,17 +90,19 @@ function HoverZone({...props}) {
     setColour("red");
     wad.attack.play();
     setPlaying(true);
-    setTimeout(() => {  
+    setTimeout(() => {
+      wad.sustain.play();  
       const interval = setInterval(() => {
-        wad.sustain.play({loop: true});
-      }, 129);
+        wad.sustain.play();
+      }, 1026.5);
       setSustainInterval(interval);
     }, 889);
   }
 
   const onHoverExit = async () => {
     console.log("exit" , playing);
-    clearInterval(sustainInterval);
+    await clearInterval(sustainInterval);
+    await wad.stop()
     await setPlaying(false);
     setColour("orange");
     wad.stop();
@@ -107,7 +123,7 @@ function RecordZone({...props}) {
   props.FileConstructor.poly.recorder.start();
   
   setTimeout(() => {
-    props.FileConstructor.poly.recorder.stop();
+    //props.FileConstructor.poly.recorder.stop();
   }, 10000);
 
 
