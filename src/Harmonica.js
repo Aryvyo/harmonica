@@ -78,8 +78,7 @@ export default function Model({ ...props }) {
 function HoverZone({...props}) {
   const mesh = useRef();
   const [colour,setColour] = React.useState("orange");
-  const [playing,setPlaying] = React.useState(false);
-  const [sustainInterval,setSustainInterval] = React.useState(null);
+
 
   const SustainLengthSwitch = () => {
     //switch statement 
