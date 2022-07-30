@@ -20,7 +20,12 @@ class FileConstructor {
           options: { mimeType : 'audio/webm' },
           onstop: function(event) {
               let blob = new Blob(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
-              window.open(URL.createObjectURL(blob));
+              let url = URL.createObjectURL(blob)
+              var a = document.createElement('a');
+              a.href = url;
+              a.download = 'harmonica.mp3';
+              a.click();
+              URL.revokeObjectURL(url);
           }
       }
   });
@@ -97,7 +102,7 @@ function HoverZone({...props}) {
 
 
   const onHover = () => {
-    wad.stop();
+    props.FileConstructor.poly.stop();
     setPlaying(true);
     setColour("red");
     wad.play({"label" : "A"}).then(() => {
@@ -117,7 +122,7 @@ function HoverZone({...props}) {
   }
     
   return (
-    <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
+    <mesh {...props} ref={mesh} onPointerDown={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} >
     <boxGeometry args={[.005,.005,.005]} />
     <meshStandardMaterial color={colour} opacity={0.1} transparent/>
     </mesh>
