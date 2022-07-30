@@ -78,7 +78,7 @@ export default function Model({ ...props }) {
 function HoverZone({...props}) {
   const mesh = useRef();
   const [colour,setColour] = React.useState("orange");
-
+  const [playing,setPlaying] = React.useState(false);
 
   const SustainLengthSwitch = () => {
     //switch statement 
@@ -90,48 +90,30 @@ function HoverZone({...props}) {
     }
   }
 
-  var wad = new Wad({source: "/audio/" + props.note + ".ogg", 
-    
-    sprite: {
-      attack: [0, 0.889],
-      sustain: [1, 1 + SustainLengthSwitch()],
-      decay: [3, 4.5]
+  var wad = new Wad({source: "/audio/" + props.note + ".ogg", });
+  var decay = new Wad({source: "/audio/" + props.note + "decay.ogg", });
 
-    }  
-  });
+  props.FileConstructor.addWad(wad,decay);
 
-
-  props.FileConstructor.addWad(wad);
-
-  useEffect(() => {
-    if(playing === false) {
-      clearInterval(sustainInterval);
-    }
-  });
 
   const onHover = () => {
     wad.stop();
-
-    setColour("red");
-    wad.attack.play();
     setPlaying(true);
-    setTimeout(() => {
-      wad.sustain.play();  
-      const interval = setInterval(() => {
-        wad.sustain.play();
-      }, 1026.5);
-      setSustainInterval(interval);
-    }, 889);
+    setColour("red");
+    wad.play({"label" : "A"}).then(() => {
+      setPlaying(false)
+    });
+
   }
 
   const onHoverExit = async () => {
-    console.log("exit" , playing);
-    await clearInterval(sustainInterval);
-    await wad.stop()
-    await setPlaying(false);
+    console.log("exit");
+    props.FileConstructor.poly.stop();
+    if (playing === true) {
+      decay.play({"label" : "A"});
+    }
+    setPlaying(false);
     setColour("orange");
-    wad.stop();
-    wad.decay.play();
   }
     
   return (

@@ -37,6 +37,7 @@ function App() {
     <Canvas 
     shadows={true}
     camera={{position: [0,1,8],fov:60, rotation:[0,0,0]}}>
+      <OrbitControls />
       <ambientLight intensity={0.25}/>
       <directionalLight position={[-5,6,6]} intensity={1}/>
       <Suspense fallback={null}>
