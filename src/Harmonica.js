@@ -49,13 +49,13 @@ export default function Model({ ...props }) {
 
 
   return (
-    <group ref={group} {...props} dispose={null}>
+    <group castShadow ref={group} {...props} dispose={null}>
       <group position={[0, 2, 0]} rotation={[Math.PI / 2, 0, Math.PI / 2]}>
         <group rotation={[Math.PI / 2, 0, 0]}>
           <group rotation={[-Math.PI / 2, 0, 0]} scale={100}>
-            <mesh geometry={nodes.defaultMaterial.geometry} material={materials.M_Metal_1} />
-            <mesh geometry={nodes.defaultMaterial_1.geometry} material={materials.M_Metal_2} />
-            <mesh geometry={nodes.defaultMaterial_2.geometry} material={materials.M_Wood_1} />
+            <mesh castShadow geometry={nodes.defaultMaterial.geometry} material={materials.M_Metal_1} />
+            <mesh castShadow geometry={nodes.defaultMaterial_1.geometry} material={materials.M_Metal_2} />
+            <mesh castShadow geometry={nodes.defaultMaterial_2.geometry} material={materials.M_Wood_1} />
 
 
 
