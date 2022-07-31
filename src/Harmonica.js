@@ -6,7 +6,7 @@ source: https://sketchfab.com/3d-models/harmonica-blues-harp-af5ac47932f34104a67
 title: Harmonica Blues Harp
 */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import Wad from 'web-audio-daw';
 
@@ -85,27 +85,18 @@ function HoverZone({...props}) {
   const [colour,setColour] = React.useState("orange");
   const [playing,setPlaying] = React.useState(false);
 
-  const SustainLengthSwitch = () => {
-    //switch statement 
-    switch(props.note) {
-      case "6": 
-      return 1.02647
-      default:
-      return 1.02647
-    }
-  }
 
   var wad = new Wad({source: "/audio/" + props.note + ".ogg", });
   var decay = new Wad({source: "/audio/" + props.note + "decay.ogg", });
 
-  props.FileConstructor.addWad(wad,decay);
+  props.FileConstructor.addWad(wad);
+  props.FileConstructor.addWad(decay);
 
 
   const onHover = () => {
-    props.FileConstructor.poly.stop();
+    props.FileConstructor.poly.stop(props.note + "decay");
     setPlaying(true);
-    setColour("red");
-    wad.play({"label" : "A"}).then(() => {
+    wad.play({"label" : props.note,env:{attack: .1, release:.02}}).then(() => {
       setPlaying(false)
     });
 
@@ -113,20 +104,30 @@ function HoverZone({...props}) {
 
   const onHoverExit = async () => {
     console.log("exit");
-    props.FileConstructor.poly.stop();
+    props.FileConstructor.poly.stop(props.note);
     if (playing === true) {
-      decay.play({"label" : "A"});
+      decay.play({"label" : props.note + "decay",env:{release:.02}});
     }
     setPlaying(false);
-    setColour("orange");
   }
-    
-  return (
-    <mesh {...props} ref={mesh} onPointerDown={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} >
-    <boxGeometry args={[.005,.005,.005]} />
-    <meshStandardMaterial color={colour} opacity={0.1} transparent/>
-    </mesh>
-  )
+
+  if (navigator.userAgentData.mobile) {
+    return (
+      <mesh {...props} ref={mesh} onPointerDown={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} >
+      <boxGeometry args={[.005,.005,.005]} />
+      <meshStandardMaterial color={colour} opacity={0.1} transparent/>
+      </mesh>
+    )
+  }
+  else {
+    return (
+      <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
+      <boxGeometry args={[.005,.005,.005]} />
+      <meshStandardMaterial color={colour} opacity={0.1} transparent/>
+      </mesh>
+    )
+    }
+
 }
 
 

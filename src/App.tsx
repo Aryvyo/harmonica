@@ -13,6 +13,7 @@ function App() {
 
   const [buttonColour, setButtonColour] = React.useState('#808080');
   
+  const [screenStyle, setScreenStyle] = React.useState("absolute top-0 h-[100vh] w-full bg-slate-600 opacity-90 z-20");
   const RecordingButton = () => {
 
     if(recording === true) {
@@ -28,7 +29,7 @@ function App() {
       // Render a completed state
     } else {
       // Render a countdown
-      return <span className="absolute top-24 left-1/2 -translate-x-1/2 text-8xl text-white">{days}:{hours}:{minutes}:{seconds}</span>;
+      return <span className="absolute top-10 lg:top-24 left-1/2 -translate-x-1/2 text-8xl not-selectable">{days}:{hours}:{minutes}:{seconds}</span>;
     }
   };
 
@@ -37,7 +38,11 @@ function App() {
 // </svg>
   return (
     <div className="h-[100vh] w-full bg-[#585758]">
-    <button className='relative left-1/2 bg-none -translate-x-1/2 bottom-10 z-10' onClick={RecordingButton}>
+    <button className={screenStyle} onClick={()=>{setScreenStyle("hidden")}}>
+      <div className='absolute left-1/2 -translate-x-1/2 text-black text-6xl'>Click to begin</div>
+      {navigator.userAgentData?.mobile}
+    </button>
+    <button className='absolute left-1/2 bg-none -translate-x-1/2 bottom-10 z-10' onClick={RecordingButton}>
     <svg style={{height:"3rem",width:"3rem"}}>
       <circle cx="1.5rem" cy="1.5rem" r="20" fill={buttonColour} />
       <circle cx="1.5rem" cy="1.5rem" r="10" fill="#FF0000" />
@@ -47,10 +52,10 @@ function App() {
     <div className="absolute top-0 h-screen w-screen" >
     <Canvas 
     shadows={true}
-    camera={{position: [0,2,8],fov:60, rotation:[0,0,0]}}>
+    camera={{position: [0,2,8],fov:60, rotation:[0,0,0]}} style={{background:"#FFFFFF"}}>
       <OrbitControls />
-      <ambientLight intensity={0.25} castShadow />
-      <directionalLight position={[-5,6,6]} intensity={1} castShadow/>
+      <ambientLight intensity={0.25}  />
+      <directionalLight position={[-5,6,6]} intensity={1} />
       <Suspense fallback={null}>
         <Model />
       </Suspense>
