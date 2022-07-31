@@ -17,7 +17,7 @@ class FileConstructor {
     this.array = [];
     this.poly = new Wad.Poly({
       recorder: {
-          options: { mimeType : 'audio/webm' },
+          options: { mimeType : 'audio/webm;codecs=opus' },
           onstop: function(event) {
               let blob = new Blob(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
               let url = URL.createObjectURL(blob)
