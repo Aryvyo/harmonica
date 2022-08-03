@@ -82,7 +82,6 @@ export default function Model({ ...props }) {
 
 function HoverZone({...props}) {
   const mesh = useRef();
-  const [colour,setColour] = React.useState("orange");
   const [playing,setPlaying] = React.useState(false);
 
 
@@ -118,7 +117,7 @@ function HoverZone({...props}) {
     return (
       <mesh {...props} ref={mesh} onPointerDown={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} >
       <boxGeometry args={[.005,.005,.005]} />
-      <meshStandardMaterial color={colour} opacity={0.1} transparent/>
+      <meshStandardMaterial opacity={0.1} transparent/>
       </mesh>
     )
   }
@@ -126,7 +125,7 @@ function HoverZone({...props}) {
     return (
       <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
       <boxGeometry args={[.005,.005,.005]} />
-      <meshStandardMaterial color={colour} opacity={0.1} transparent/>
+      <meshStandardMaterial opacity={0.1} transparent/>
       </mesh>
     )
     }
