@@ -8,6 +8,8 @@ import { array } from './Harmonica';
 import Countdown from 'react-countdown';
 
 function App() {
+  
+  console.log(navigator.userAgentData);
 
   const [recording, setRecording] = React.useState(false);
 
@@ -40,9 +42,9 @@ function App() {
     <div className="h-[100vh] w-full bg-[#585758]">
     <button className={screenStyle} onClick={()=>{setScreenStyle("hidden")}}>
       <div className='absolute left-1/2 -translate-x-1/2 text-black text-6xl'>Click to begin</div>
-      {navigator.userAgentData?.mobile}
+      {navigator.userAgentData?.mobile && <div className='absolute left-1/2 -translate-x-1/2 text-black text-6xl'>Hover to play</div>}
     </button>
-    <button className='absolute left-1/2 bg-none -translate-x-1/2 bottom-10 z-10' onClick={RecordingButton}>
+    <button className='absolute left-1/2 bg-none -translate-x-1/2 bottom-2 md:bottom-10 z-10' onClick={RecordingButton}>
     <svg style={{height:"3rem",width:"3rem"}}>
       <circle cx="1.5rem" cy="1.5rem" r="20" fill={buttonColour} />
       <circle cx="1.5rem" cy="1.5rem" r="10" fill="#FF0000" />
@@ -53,7 +55,7 @@ function App() {
     <Canvas 
     shadows={true}
     camera={{position: [0,2,8],fov:60, rotation:[0,0,0]}} style={{background:"#FFFFFF"}}>
-      <OrbitControls />
+      {!navigator.userAgentData?.mobile && <OrbitControls />}
       <ambientLight intensity={0.25}  />
       <directionalLight position={[-5,6,6]} intensity={1} />
       <Suspense fallback={null}>

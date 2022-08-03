@@ -98,7 +98,10 @@ function HoverZone({...props}) {
     setPlaying(true);
     wad.play({"label" : props.note,env:{attack: .1, release:.02}}).then(() => {
       setPlaying(false)
-    });
+    }).catch(err => {
+      console.log(err);
+    }
+    );
 
   }
 

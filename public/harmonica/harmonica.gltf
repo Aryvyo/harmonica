@@ -275,7 +275,7 @@
       "uri": "textures/M_Metal_1_baseColor.jpeg"
     },
     {
-      "uri": "textures/M_Metal_1_metallicRoughness.png"
+      "uri": "textures/M_Wood_1_baseColor.jpeg"
     },
     {
       "uri": "textures/M_Metal_1_normal.png"
@@ -284,7 +284,7 @@
       "uri": "textures/M_Metal_2_baseColor.jpeg"
     },
     {
-      "uri": "textures/M_Metal_2_metallicRoughness.png"
+      "uri": "textures/M_Wood_1_baseColor.jpeg"
     },
     {
       "uri": "textures/M_Metal_2_normal.png"
@@ -293,7 +293,7 @@
       "uri": "textures/M_Wood_1_baseColor.jpeg"
     },
     {
-      "uri": "textures/M_Wood_1_metallicRoughness.png"
+      "uri": "textures/M_Wood_1_baseColor.jpeg"
     },
     {
       "uri": "textures/M_Wood_1_normal.png"
@@ -312,9 +312,6 @@
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
-        },
-        "metallicRoughnessTexture": {
-          "index": 1
         }
       }
     },
@@ -330,9 +327,6 @@
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 3
-        },
-        "metallicRoughnessTexture": {
-          "index": 4
         }
       }
     },
@@ -348,9 +342,6 @@
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 6
-        },
-        "metallicRoughnessTexture": {
-          "index": 7
         }
       }
     }
