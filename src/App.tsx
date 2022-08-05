@@ -2,10 +2,24 @@ import React, { Suspense } from 'react';
 import './App.css';
 
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Html, useProgress } from '@react-three/drei';
 import Model from './Harmonica';
 import { array } from './Harmonica';
 import Countdown from 'react-countdown';
+
+
+function Loader() {
+  const { progress } = useProgress()
+  return (
+    <Html>
+      <div className="loader">
+        <div className="loader__inner">
+          <div className="loader__inner__text"> {Math.round(progress)}% </div>
+        </div>
+      </div>
+    </Html>
+  );
+}
 
 function App() {
   
@@ -58,7 +72,7 @@ function App() {
       {!navigator.userAgentData?.mobile && <OrbitControls />}
       <ambientLight intensity={0.25}  />
       <directionalLight position={[-5,6,6]} intensity={1} />
-      <Suspense fallback={null}>
+      <Suspense fallback={<Loader/>}>
         <Model />
       </Suspense>
       

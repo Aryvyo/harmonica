@@ -112,23 +112,25 @@ function HoverZone({...props}) {
     }
     setPlaying(false);
   }
-
-  if (navigator.userAgentData.mobile) {
-    return (
-      <mesh {...props} ref={mesh} onPointerDown={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} >
-      <boxGeometry args={[.005,.005,.005]} />
-      <meshStandardMaterial opacity={0.1} transparent/>
-      </mesh>
-    )
-  }
-  else {
-    return (
-      <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
-      <boxGeometry args={[.005,.005,.005]} />
-      <meshStandardMaterial opacity={0.1} transparent/>
-      </mesh>
-    )
+  setTimeout(() => {
+    if (navigator.userAgentData.mobile) {
+      return (
+        <mesh {...props} ref={mesh} onPointerDown={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} >
+        <boxGeometry args={[.005,.005,.005]} />
+        <meshStandardMaterial opacity={0.1} transparent/>
+        </mesh>
+      )
     }
+    else {
+      return (
+        <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
+        <boxGeometry args={[.005,.005,.005]} />
+        <meshStandardMaterial opacity={0.1} transparent/>
+        </mesh>
+      )
+      }
+  }, 100);
+
 
 }
 
