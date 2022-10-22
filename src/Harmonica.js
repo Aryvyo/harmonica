@@ -9,30 +9,39 @@ title: Harmonica Blues Harp
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import Wad from 'web-audio-daw';
-
-
+import { useEffect } from 'react';
+import useSound from 'use-sound';
 
 class FileConstructor {
   constructor() {
     this.array = [];
     this.poly = new Wad.Poly({
-      recorder: {
-          options: { mimeType : 'audio/webm;codecs=opus' },
+      /*recorder: {
+          options: { },
           onstop: function(event) {
-              let blob = new Blob(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
-              let url = URL.createObjectURL(blob)
+              // constructFile(this.recorder.chunks, { 'type' : 'audio/mp3;codecs=opus' });
+              let url = URL.createObjectURL(new Blob(this.recorder.chunks));
               var a = document.createElement('a');
               a.href = url;
               a.download = 'harmonica.mp3';
               a.click();
               URL.revokeObjectURL(url);
+              
           }
-      }
+      }*/
   });
 
   }
   addWad(wad) {
     this.poly.add(wad);
+  }
+  addStop(stop){
+    this.array.push(stop);
+  }
+  stopAll() {
+    for (let i = 0; i < this.array.length; i++) {
+      this.array[i]();
+    }
   }
   getArray() {
     return this.array;
@@ -45,8 +54,16 @@ export { array }
 export default function Model({ ...props }) {
   const group = useRef()
   const { nodes, materials } = useGLTF('/harmonica/harmonica.gltf')
-  
+  const [mobile, setMobile] = React.useState(false)
 
+  useEffect(() => {
+    if (navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)) {  
+      setMobile(true);
+    }else if (navigator.userAgentData?.mobile)  {
+      setMobile(true);
+    }
+    console.log(mobile);
+    }, [])
 
   return (
     <group castShadow ref={group} {...props} dispose={null}>
@@ -60,16 +77,16 @@ export default function Model({ ...props }) {
 
 
 
-            <HoverZone position={[0.012,0.0321,0.01]} note="1" FileConstructor={array}/>
-            <HoverZone position={[0.012,0.025,0.01]} note="2" FileConstructor={array}/>
-            <HoverZone position={[0.012,0.0179,0.01]} note="3" FileConstructor={array}/>
-            <HoverZone position={[0.012,0.0108,0.01]} note="4" FileConstructor={array}/>
-            <HoverZone position={[0.012,0.0037,0.01]} note="5" FileConstructor={array}/>
-            <HoverZone position={[0.012,-0.0037,0.01]} note="6" FileConstructor={array}/>
-            <HoverZone position={[0.012,-0.0108,0.01]} note="7" FileConstructor={array}/>
-            <HoverZone position={[0.012,-0.0179,0.01]} note="8" FileConstructor={array}/>
-            <HoverZone position={[0.012,-0.025,0.01]} note="9" FileConstructor={array}/>
-            <HoverZone position={[0.012,-0.0321,0.01]} note="10" FileConstructor={array}/>
+            <HoverZone position={[0.012,0.0321,0.01]} note="1" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,0.025,0.01]} note="2" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,0.0179,0.01]} note="3" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,0.0108,0.01]} note="4" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,0.0037,0.01]} note="5" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,-0.0037,0.01]} note="6" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,-0.0108,0.01]} note="7" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,-0.0179,0.01]} note="8" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,-0.025,0.01]} note="9" FileConstructor={array} mobile={mobile}/>
+            <HoverZone position={[0.012,-0.0321,0.01]} note="10" FileConstructor={array} mobile={mobile}/>
 
           </group>
         </group>
@@ -83,53 +100,40 @@ export default function Model({ ...props }) {
 function HoverZone({...props}) {
   const mesh = useRef();
   const [playing,setPlaying] = React.useState(false);
-
-
-  var wad = new Wad({source: "/audio/" + props.note + ".ogg", });
-  var decay = new Wad({source: "/audio/" + props.note + "decay.ogg", });
-
-  props.FileConstructor.addWad(wad);
-  props.FileConstructor.addWad(decay);
-
+  const [transp,setTransp] = React.useState(0);
+  const mobile = props.mobile;
+  const [play, {stop, sound}] = useSound("/audio/" + props.note + ".wav")
+  const [decay] = useSound("/audio/" + props.note + "decay.wav")
+  array.addStop(stop);
 
   const onHover = () => {
-    props.FileConstructor.poly.stop(props.note + "decay");
-    setPlaying(true);
-    wad.play({"label" : props.note,env:{attack: .1, release:.02}}).then(() => {
-      setPlaying(false)
-    }).catch(err => {
-      console.log(err);
+    if (props.mobile) {
+      
+
     }
-    );
+    setPlaying(true);
+    array.stopAll();
+
+    play();
+    sound.fade(1,0.7,0.3);
 
   }
 
   const onHoverExit = async () => {
     console.log("exit");
-    props.FileConstructor.poly.stop(props.note);
-    if (playing === true) {
-      decay.play({"label" : props.note + "decay",env:{release:.02}});
-    }
+    stop();
+    //decay();
     setPlaying(false);
   }
-  setTimeout(() => {
-    if (navigator.userAgentData.mobile) {
-      return (
-        <mesh {...props} ref={mesh} onPointerDown={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} >
-        <boxGeometry args={[.005,.005,.005]} />
-        <meshStandardMaterial opacity={0.1} transparent/>
-        </mesh>
-      )
-    }
-    else {
-      return (
-        <mesh {...props} ref={mesh} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}} >
-        <boxGeometry args={[.005,.005,.005]} />
-        <meshStandardMaterial opacity={0.1} transparent/>
-        </mesh>
-      )
-      }
-  }, 100);
+
+    return (
+      <mesh {...props} ref={mesh} onClick={() => {onHover();}} onPointerUp={()=>{onHoverExit();}} onPointerOver={() => {onHover();}} onPointerLeave={()=>{onHoverExit();}}>
+      <boxGeometry args={[.005,.005,.005]} />
+      <meshStandardMaterial opacity={transp} transparent/>
+      </mesh>
+    )
+      
+
 
 
 }
