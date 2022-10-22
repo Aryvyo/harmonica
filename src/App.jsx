@@ -47,13 +47,13 @@ function App() {
       // Render a completed state
     } else {
       // Render a countdown
-      return <span className="absolute bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 text-6xl md:text-8xl not-selectable font-sans">{days}:{hours}:{minutes}:{seconds}</span>;
+      return <span className="absolute bottom-28 md:bottom-10 left-1/2 -translate-x-1/2 text-6xl md:text-8xl not-selectable font-sans">{days}:{hours}:{minutes}:{seconds}</span>;
     }
   };
   const menuRenderer = ({ days, hours, minutes, seconds, completed }) => {
 
       // Render a countdown
-      return <span className="absolute text-white bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 text-6xl md:text-8xl not-selectable font-sans">{days}:{hours}:{minutes}:{seconds}</span>;
+      return <span className="absolute text-white bottom-28 md:bottom-10 left-1/2 -translate-x-1/2 text-6xl md:text-8xl not-selectable font-sans">{days}:{hours}:{minutes}:{seconds}</span>;
   };
 
   useEffect(() => {
