@@ -29,6 +29,7 @@ function App() {
   const [buttonColour, setButtonColour] = React.useState('#808080');
   const [mobile, setMobile] = React.useState(false);
   const [rotation, setRotation] = React.useState(0);
+  const [fov, setFov] = React.useState(60);
 
   const [screenStyle, setScreenStyle] = React.useState("absolute top-0 h-[100vh] w-full bg-slate-600 bg-black z-20");
   /*const RecordingButton = () => {
@@ -65,6 +66,15 @@ function App() {
   }
   console.log(mobile);
   }, [])
+
+  useEffect(() => {
+    if(mobile === true) {
+      setFov(98);
+    }
+    else {
+      setFov(60);
+    }
+  }, [mobile])
 //    <svg xmlns="http://www.w3.org/2000/svg" style={{height:"3rem",width:"3rem"}} viewBox="0 0 20 20" fill={buttonColour}>
 // <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
 // </svg>
@@ -84,7 +94,7 @@ function App() {
     <div className="absolute top-0 h-screen w-screen" >
     <Canvas 
     shadows={true}
-    camera={{position: [0,2,8],fov:60, rotation:[0,0,0]}} style={{background:"#FFFFFF", touchAction:"none"}}
+    camera={{position: [0,2,8],fov:fov, rotation:[0,4,0]}} style={{background:"#FFFFFF", touchAction:"none"}}
     resize={{polyfill: ResizeObserver}}>
       <OrbitControls />
       <ambientLight intensity={0.25}  />
