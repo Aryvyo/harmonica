@@ -81,7 +81,7 @@ function App() {
   return (
     <div className="h-[100vh] w-full bg-[#585758] touch-none overflow-hidden fixed">
     <button className={screenStyle} onClick={()=>{setScreenStyle("hidden")}}>
-      <div className='absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 text-white font-sans text-5xl md:text-8xl'>who is the harmonica player?</div>
+      <div className='absolute left-1/2 top-[40%] md:top-1/2 -translate-y-1/2 -translate-x-1/2 text-white font-sans text-5xl md:text-8xl'>who is the harmonica player?</div>
       <Countdown date={1666810800000} renderer={menuRenderer}/>
     </button>
     {/*<button className='absolute left-1/2 bg-none -translate-x-1/2 bottom-2 md:bottom-10 z-10' onClick={RecordingButton}>
