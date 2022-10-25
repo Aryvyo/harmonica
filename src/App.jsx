@@ -44,16 +44,19 @@ function App() {
   }*/
   const renderer = ({ days, hours, minutes, seconds, completed }) => {
     if (completed) {
-      // Render a completed state
+      window.location.assign("https://www.youtube.com/watch?v=LvQJAsmSiX4")
     } else {
       // Render a countdown
       return <span className="absolute bottom-28 md:bottom-10 left-1/2 -translate-x-1/2 text-6xl md:text-8xl not-selectable font-sans">{days}:{hours}:{minutes}:{seconds}</span>;
     }
   };
   const menuRenderer = ({ days, hours, minutes, seconds, completed }) => {
-
+    if (completed) {
+      window.location.assign("https://www.youtube.com/watch?v=LvQJAsmSiX4")
+    } else {
       // Render a countdown
       return <span className="absolute text-white bottom-28 md:bottom-10 left-1/2 -translate-x-1/2 text-6xl md:text-8xl not-selectable font-sans">{days}:{hours}:{minutes}:{seconds}</span>;
+    }
   };
 
   useEffect(() => {
